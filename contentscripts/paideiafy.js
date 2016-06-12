@@ -6,19 +6,13 @@
     jquery preloaded in 'manifest.json'
 
 ******** */
-// function fetchJSONFile(path, callback) {
-//     var httpRequest = new XMLHttpRequest();
-//     httpRequest.onreadystatechange = function() {
-//         if (httpRequest.readyState === 4) {
-//             if (httpRequest.status === 200) {
-//                 var data = JSON.parse(httpRequest.responseText);
-//                 if (callback) callback(data);
-//             }
-//         }
-//     };
-//     httpRequest.open('GET', path);
-//     httpRequest.send();
-// }
+function anotherDictionary (word) {
+  return '<p>Try this word in another dictionary: </p>' +
+    '<ul>' +
+      '<li><a target="_blank" href="http://logeion.uchicago.edu/index.html#'+ word + '">Logeion</a></li>' +
+      '<li><a target="_blank" href="http://www.perseus.tufts.edu/hopper/resolveform?type=exact&lookup=&lang=greek">Perseus LSJ</a></li>' +
+    '</ul>'
+};
 
 console.log('running paideiafy.js');
 
@@ -32,7 +26,7 @@ function insertDiv(child) {
   div.setAttribute('id', 'paideia-panel');
   div.setAttribute('style', 'position: fixed; top: 1em; right: 1em; padding: 10px 20px; '
     +'border: 1px solid #007095; border-radius: 2em; max-width: 34em;'
-    +' word-wrap: break-word; background-color: aliceblue; z-index:999;');
+    +' word-wrap: break-word; background-color: aliceblue; z-index:'+ (Math.pow(2,31) - 1) + ';');
 
   rmPanel()
 
@@ -43,14 +37,15 @@ function insertDiv(child) {
   document.body.appendChild(div);
 }
 
-function manualSearch() {
+function manualSearch(word) {
   insertDiv(
     '<div class="container" id="paideia-panel"><div class="row">' +
     '<h2 style="margin:0;">Sorry!</h2> ' +
-    '<p>We couldn\'t find any results for this entry. Try typing the word manually.</p>' +
+    anotherDictionary(word) +
+    '<p>Or, try typing the word manually.</p>' +
     '</div><div class="row">' +
     '<div class="col-xs-6 col-xs-offset-3 paideia-input">' +
-    '  <input type="text" id="manual-paideia-entry" class="form-control" placeholder="puellam">' +
+    '  <input type="text" id="manual-paideia-entry" class="form-control" placeholder="type your word here...">' +
     '  <br>' +
     '  <div style="text-align:center;">' +
     '    <button class="paideia-button" type="submit" id="manual-paideia-search">Search</button>' +
@@ -69,6 +64,7 @@ function manualSearch() {
 }
 
 function paidieaify(word, language) {
+  var thanks = '<hr style="margin-top: 2em;" /><footer style="font-size:10px; text-align: right;">Morphology provided by Morpheus from the <a href="http://www.perseus.tufts.edu/hopper/">Perseus Digital Library</a> at Tufts University.</footer>';
   var langCode = 'la'; // latin by default
   if (language == 'greek') {
     langCode = 'greek';
@@ -85,6 +81,7 @@ function paidieaify(word, language) {
   }
 
   $.ajax(settings).done(function (response) {
+    console.log(response);
     var toReturn = (response === null) ? info.selectionText : response;
 
     // create jquery object from HTML
@@ -96,10 +93,10 @@ function paidieaify(word, language) {
     if (resultFound) {
       var header = lemma.find('.lemma_header').prop('outerHTML');
             table = lemma.find('table').addClass('paideia-table').prop('outerHTML');
-      insertDiv('<div id="paideia-panel">' + header + "<br />" + table + '</div>');
+      insertDiv('<div id="paideia-panel">' + header + "<br />" + table + anotherDictionary(word) + thanks +'</div>');
       $('#paideia-panel').click(rmPanel);
     } else {
-      manualSearch()
+      manualSearch(word)
     }
   });
 }

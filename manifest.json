@@ -2,7 +2,7 @@
   "name": "Chromium Dictionary",
   "short_name":"Chromium",
   "description": "Look up Latin or Greek words directly in your webpage.",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "icons": {
     "16": "paideia-favicon.png",
     "48": "paideia-favicon.png",
